@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pattern-Based Drawing App</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="toolbar">
+            <div class="tool-section">
+                <label>Tools:</label>
+                <button id="pencil-tool" class="tool-btn active">✏️ Pencil</button>
+                <button id="eraser-tool" class="tool-btn">🧹 Eraser</button>
+            </div>
+            
+            <div class="color-section">
+                <label>Color:</label>
+                <input type="color" id="color-picker" value="#000000">
+                <div class="color-presets">
+                    <div class="color-preset" data-color="#000000" style="background: #000000;"></div>
+                    <div class="color-preset" data-color="#ff0000" style="background: #ff0000;"></div>
+                    <div class="color-preset" data-color="#00ff00" style="background: #00ff00;"></div>
+                    <div class="color-preset" data-color="#0000ff" style="background: #0000ff;"></div>
+                    <div class="color-preset" data-color="#ffff00" style="background: #ffff00;"></div>
+                    <div class="color-preset" data-color="#ff00ff" style="background: #ff00ff;"></div>
+                    <div class="color-preset" data-color="#00ffff" style="background: #00ffff;"></div>
+                    <div class="color-preset" data-color="#ffffff" style="background: #ffffff; border: 1px solid #ccc;"></div>
+                </div>
+            </div>
+
+            <div class="size-section">
+                <label>Size:</label>
+                <input type="range" id="brush-size" min="1" max="50" value="5">
+                <span id="size-display">5px</span>
+            </div>
+
+            <div class="action-section">
+                <button id="undo-btn">↶ Undo</button>
+                <button id="redo-btn">↷ Redo</button>
+                <button id="clear-btn">🗑️ Clear</button>
+                <button id="save-btn">💾 Save</button>
+            </div>
+        </header>
+
+        <main class="canvas-container">
+            <canvas id="drawing-canvas" width="800" height="600"></canvas>
+        </main>
+
+        <footer class="status-bar">
+            <span id="status-text">Ready to draw</span>
+            <span id="coordinates"></span>
+        </footer>
+    </div>
+
+    <!-- Include all JS modules -->
+    <script type="module" src="js/EventEmitter.js"></script>
+    <script type="module" src="js/Command.js"></script>
+    <script type="module" src="js/DrawingStrategies.js"></script>
+    <script type="module" src="js/DrawingState.js"></script>
+    <script type="module" src="js/CanvasManager.js"></script>
+    <script type="module" src="js/ToolManager.js"></script>
+    <script type="module" src="js/ColorManager.js"></script>
+    <script type="module" src="js/CommandHistory.js"></script>
+    <script type="module" src="js/DrawingApp.js"></script>
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>

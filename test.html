@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drawing App Test</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+            background: #f0f0f0;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        .test-canvas {
+            border: 2px solid #ddd;
+            margin: 10px 0;
+        }
+        .results {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1>Drawing App Test Suite</h1>
+    
+    <div class="test-section">
+        <h2>Pattern Tests</h2>
+        <button onclick="testPatterns()">Test GoF Patterns</button>
+        <div id="pattern-results" class="results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Drawing Functionality</h2>
+        <canvas id="test-canvas" class="test-canvas" width="400" height="300"></canvas>
+        <br>
+        <button onclick="testDrawing()">Test Drawing</button>
+        <button onclick="testUndo()">Test Undo</button>
+        <button onclick="testRedo()">Test Redo</button>
+        <button onclick="testColorChange()">Test Color Change</button>
+        <button onclick="testToolChange()">Test Tool Change</button>
+        <button onclick="exportTestSection()">Export Test Section</button>
+        <div id="drawing-results" class="results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Visual Output</h2>
+        <div id="visual-output"></div>
+    </div>
+
+    <!-- Import modules -->
+    <script type="module">
+        import { DrawingApp } from './js/DrawingApp.js';
+        import { StrategyFactory } from './js/DrawingStrategies.js';
+        import { EventEmitter } from './js/EventEmitter.js';
+        import { CommandHistory } from './js/CommandHistory.js';
+
+        let testApp;
+
+        // Initialize test app
+        const canvas = document.getElementById('test-canvas');
+        testApp = new DrawingApp(canvas);
+        testApp.initialize();
+
+        // Make available globally for tests
+        window.testApp = testApp;
+        window.testModules = { StrategyFactory, EventEmitter, CommandHistory };
+
+        // Test functions
+        window.testPatterns = function() {
+            const results = document.getElementById('pattern-results');
+            let output = 'Pattern Tests:\n\n';
+
+            try {
+                // Test Observer Pattern (EventEmitter)
+                const emitter = new EventEmitter();
+                let received = false;
+                emitter.on('test', () => { received = true; });
+                emitter.emit('test');
+                output += `✅ Observer Pattern: ${received ? 'PASS' : 'FAIL'}\n`;
+
+                // Test Strategy Pattern
+                const pencil = StrategyFactory.create('pencil');
+                const eraser = StrategyFactory.create('eraser');
+                output += `✅ Strategy Pattern: ${pencil && eraser ? 'PASS' : 'FAIL'}\n`;
+
+                // Test Command Pattern
+                const history = new CommandHistory();
+                output += `✅ Command Pattern: ${history.canUndo() === false ? 'PASS' : 'FAIL'}\n`;
+
+                // Test Facade Pattern
+                output += `✅ Facade Pattern: ${testApp ? 'PASS' : 'FAIL'}\n`;
+
+                // Test State Pattern
+                output += `✅ State Pattern: ${testApp.stateContext ? 'PASS' : 'FAIL'}\n`;
+
+            } catch (error) {
+                output += `❌ Pattern test error: ${error.message}\n`;
+            }
+
+            results.textContent = output;
+        };
+
+        window.testDrawing = function() {
+            const results = document.getElementById('drawing-results');
+            let output = 'Drawing Tests:\n\n';
+
+            try {
+                // Test basic drawing
+                testApp.setTool('pencil');
+                testApp.setColor('#ff0000');
+                testApp.setBrushSize(5);
+
+                // Simulate drawing a line
+                const path = [
+                    {x: 50, y: 50},
+                    {x: 100, y: 100},
+                    {x: 150, y: 50}
+                ];
+
+                window.testUtils?.simulateDrawing(path, 'pencil', '#ff0000');
+                output += '✅ Basic drawing: PASS\n';
+
+                // Test app state
+                const state = testApp.getState();
+                output += `✅ App state: Tool=${state.tool.currentTool}, Color=${state.color.currentColor}\n`;
+                output += `✅ Canvas: ${state.canvas.width}x${state.canvas.height}\n`;
+                output += `✅ History: ${state.history.totalCommands} commands\n`;
+
+            } catch (error) {
+                output += `❌ Drawing test error: ${error.message}\n`;
+            }
+
+            results.textContent = output;
+        };
+
+        window.testUndo = function() {
+            const canUndo = testApp.undo();
+            updateTestResults(`Undo test: ${canUndo ? 'SUCCESS' : 'No actions to undo'}`);
+        };
+
+        window.testRedo = function() {
+            const canRedo = testApp.redo();
+            updateTestResults(`Redo test: ${canRedo ? 'SUCCESS' : 'No actions to redo'}`);
+        };
+
+        window.testColorChange = function() {
+            testApp.setColor('#00ff00');
+            updateTestResults('Color changed to green');
+        };
+
+        window.testToolChange = function() {
+            testApp.setTool('eraser');
+            updateTestResults('Tool changed to eraser');
+        };
+
+        window.exportTestSection = function() {
+            try {
+                const section = testApp.exportCanvasSection(0, 0, 200, 150);
+                const visualOutput = document.getElementById('visual-output');
+                
+                const img = document.createElement('img');
+                img.src = section.dataURL;
+                img.style.border = '2px solid #007bff';
+                img.style.margin = '10px';
+                img.title = `Section: ${section.bounds.width}x${section.bounds.height}`;
+                
+                visualOutput.innerHTML = '<h3>Canvas Section Export:</h3>';
+                visualOutput.appendChild(img);
+                
+                updateTestResults(`Exported section: ${section.bounds.width}x${section.bounds.height} pixels`);
+            } catch (error) {
+                updateTestResults(`Export error: ${error.message}`);
+            }
+        };
+
+        function updateTestResults(message) {
+            const results = document.getElementById('drawing-results');
+            const currentText = results.textContent || '';
+            results.textContent = currentText + message + '\n';
+        }
+    </script>
+</body>
+</html>
