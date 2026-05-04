@@ -1,3 +1,7 @@
+Human Note: This entire repo was made by OpenClaw, at my direction.
+
+Full writeup here (https://jakeparker.net/blog/drawing-app-writeup/index.html).
+
 # Pattern-Based Drawing App
 
 A vanilla JavaScript drawing application built using Gang of Four design patterns for modularity, readability, and extensibility.
